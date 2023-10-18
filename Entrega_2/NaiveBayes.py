@@ -47,9 +47,6 @@ prediction2 = model2.predict(x_test2) #Predicciones ustilziando el conjunto de p
 accuracy2 = accuracy_score(y_test2, prediction2) #precision del modelo
 print(f"Precision del modelo Water: {accuracy2}\n---------------------------------")
 
-
-
-
 # graphic
 #Titanic
 Clases = ["Die","Survival"]
