@@ -18,14 +18,11 @@ path2 = os.path.abspath("Entrega_2/Data/TitanicTest.csv")
 train = pd.read_csv(path) 
 test = pd.read_csv(path2)
 
-train['train'] = 1
-test['train'] = 0
-
 data = pd.concat([train, test], ignore_index=True, sort=False)
 
 # Preprocess ------------------------------------------------------------------------------------------------------------------
 features = ['Age', 'Embarked', 'Fare', 'Parch', 'Pclass', 'Sex', 'SibSp']
-target = 'Survived'
+name_target = 'Survived'
 
 #imputar valores faltantes
 data['Age'].fillna(data['Age'].median(), inplace=True)  
@@ -37,11 +34,13 @@ data['Embarked'] = label.fit_transform(data['Embarked'])
 
 data['Age'] = pd.qcut(data['Age'], 10, labels=False, duplicates='drop') #Discretizar la edad en 10 intervalos 
 
-# Trainin train Titanic ---------------------------------------------------------------------------------------------------------
-train = data.query('train == 1')
-test = data.query('train == 0')
+data = data.dropna()
 
-x_train, x_test, y_train, y_test = tts(train[features], train[target], test_size=0.3, random_state=42) 
+# Trainin train Titanic ---------------------------------------------------------------------------------------------------------
+train = data[features]
+target = data[name_target]
+
+x_train, x_test, y_train, y_test = tts(train[features], target, test_size=0.2, random_state=42) 
 
 # fit ---------------------------------------------------------------------------------------------------------------------------
 model.fit(x_train,y_train) #entrenar el modelo titanic
@@ -61,6 +60,6 @@ Clases = ["Not Survival", "Survival"]
 Matriz= cm(model,x_train,y_train,x_test,y_test, classes= Clases,cmap="Greens")
 Matriz.poof()
 
-Matriz= cm(model,x_train,y_train,x_test,y_test, classes= Clases,percent=True, cmap="Greens")
+Matriz= cm(model,x_train,y_train,x_test,y_test,percent=True, cmap="Greens")
 Matriz.poof()
 
