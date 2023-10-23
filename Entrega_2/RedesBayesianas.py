@@ -7,6 +7,7 @@ from yellowbrick.classifier import confusion_matrix as cm
 
 #Variables
 label = LabelEncoder()
+model = bn()
 
 # Data train
 path = os.path.abspath("Entrega_2/Data/Titanic.csv")    #https://www.kaggle.com/competitions/titanic/data?select=train.csv
@@ -37,3 +38,5 @@ data['Age'] = pd.qcut(data['Age'], 10, labels=False, duplicates='drop') #Discret
 # Training Titanic
 train = data.query('train == 1')
 test = data.query('train == 0')
+
+model = bn([('Pclass', 'Survived'), ('Sex', 'Survived'), ('Pclass', 'Survived'), ('Pclass', 'Survived'), ('Pclass', 'Survived'), ('Pclass', 'Survived') ])

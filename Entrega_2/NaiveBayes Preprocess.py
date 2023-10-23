@@ -40,7 +40,7 @@ data = data.dropna()
 train = data[features]
 target = data[name_target]
 
-x_train, x_test, y_train, y_test = tts(train[features], target, test_size=0.2, random_state=42) 
+x_train, x_test, y_train, y_test = tts(train, target, test_size=0.2, random_state=42) 
 
 # fit ---------------------------------------------------------------------------------------------------------------------------
 model.fit(x_train,y_train) #entrenar el modelo titanic
