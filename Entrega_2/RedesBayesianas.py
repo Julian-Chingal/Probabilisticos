@@ -2,12 +2,12 @@ import os
 import pandas as pd
 from pgmpy.models import BayesianNetwork as bn
 from pgmpy.inference import VariableElimination as ve
+from pgmpy.estimators import MaximumLikelihoodEstimator as mle
 from sklearn.preprocessing import LabelEncoder
 from yellowbrick.classifier import confusion_matrix as cm
 
 #Variables
 label = LabelEncoder()
-model = bn()
 
 # Data train
 path = os.path.abspath("Entrega_2/Data/Titanic.csv")    #https://www.kaggle.com/competitions/titanic/data?select=train.csv
@@ -30,13 +30,45 @@ data['Age'].fillna(data['Age'].median(), inplace=True)
 data['Embarked'].fillna(data['Embarked'].mode()[0], inplace=True)
 
 # Transformar los valores categoricos
-data['Sex'] = label.fit_transform(data['Sex']) 
-data['Embarked'] = label.fit_transform(data['Embarked'])
+data['Sex'] = label.fit_transform(data['Sex']) # 1 masculino,  femenino
+data['Embarked'] = data['Embarked'].replace(['S', 'C', 'Q'], [1, 2, 3])
 
 data['Age'] = pd.qcut(data['Age'], 10, labels=False, duplicates='drop') #Discretizar la edad en 10 intervalos 
 
-# Training Titanic
-train = data.query('train == 1')
-test = data.query('train == 0')
+# Training Titanic ----------------------------------------------------------------------------------------------------------------
+train = data[data['train'] == 1]
+test = data[data['train'] == 0]
 
-model = bn([('Pclass', 'Survived'), ('Sex', 'Survived'), ('Pclass', 'Survived'), ('Pclass', 'Survived'), ('Pclass', 'Survived'), ('Pclass', 'Survived') ])
+# Limpieza adicional a datos inconclusos del dataset Test
+test = test[features].dropna() # valores incompletos
+test.drop(test[(test['Fare'] == 7) | (test['Fare'] == 9.6875)].index, inplace=True)
+
+# Definir la estructura del modelo de la red bayesiana
+model = bn([('Age', 'Survived'), ('Sex', 'Survived'), ('Pclass', 'Survived'), ('Fare', 'Pclass'), ('Embarked', 'Pclass'), ('Parch', 'Survived'), ('SibSp', 'Survived')])
+model.fit(train[features + [target]], estimator=mle) #Entrenar modelo
+
+# inferencia de la red bayesiana
+inference = ve(model)
+
+# Consultas---------------------------------------------------------------------------------------------------------------------------
+prueba = []
+aux = 0
+
+for index, row in test.iterrows():
+    evidence = {
+        'Age': row['Age'],
+        'Embarked': row['Embarked'],
+        'Fare': row['Fare'],
+        'Parch': row['Parch'],
+        'Pclass': row['Pclass'],
+        'Sex': row['Sex'],
+        'SibSp': row['SibSp']
+    }
+    prueba.append(evidence)
+    aux += 1
+
+
+pru = prueba[2]
+print(pru)
+result = inference.query(variables=['Survived'], evidence=pru)
+print(result)
