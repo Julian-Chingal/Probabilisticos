@@ -7,6 +7,7 @@ from yellowbrick.classifier import confusion_matrix as cm
 
 #Variables
 label = LabelEncoder()
+
 # Data train
 path = os.path.abspath("Entrega_2/Data/Titanic.csv")    #https://www.kaggle.com/competitions/titanic/data?select=train.csv
 path2 = os.path.abspath("Entrega_2/Data/TitanicTest.csv")    

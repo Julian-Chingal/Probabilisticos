@@ -31,7 +31,7 @@ print(file.head())
 input = file.drop(columns=['Survived']) #eliminar la variable objetivo para entrenar le modelo con los atributos
 target = file['Survived'] # Variable objetivo
 x_train, x_test, y_train, y_test = tts(input, target, test_size=0.3, random_state=42) 
-
+# 
 #--------------------------------------------------------------------------------------------------------------------------------
 # fit
 model.fit(x_train,y_train) #entrenar el modelo titanic

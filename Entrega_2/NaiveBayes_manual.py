@@ -8,6 +8,13 @@ media = 0
 sigma = 0
 pi = 0
 
+
+x_train = train[features]
+y_train = train[target]
+x_test = test[features]
+y_test = test[target]
+
+
 # Definicion del modelo
 def fit(Class, Data):
     global N_Attributes,media, sigma,pi
