@@ -33,16 +33,16 @@ data['Embarked'].fillna(data['Embarked'].mode()[0], inplace=True)
 data['Sex'] = label.fit_transform(data['Sex']) # 1 masculino,  femenino
 data['Embarked'] = data['Embarked'].replace(['S', 'C', 'Q'], [1, 2, 3])
 
-#Discretizar la informacion 
+#Discretizar la informacion, en 10 contenedores o bins para discretizar la variable continua.
 data['Age'] = pd.qcut(data['Age'], 10, labels=False, duplicates='drop') 
+data['Fare'] = pd.qcut(data['Fare'], 10, labels=False, duplicates='drop')
+data['Parch'] = pd.qcut(data['Parch'], 2, labels=False, duplicates='drop')
 
 # Training Titanic ----------------------------------------------------------------------------------------------------------------
 train = data[data['train'] == 1]
 test = data[data['train'] == 0]
 
-# Limpieza adicional a datos inconclusos del dataset Test
 test = test[features].dropna() # valores incompletos
-test.drop(test[(test['Fare'] == 7) | (test['Fare'] == 9.6875)].index, inplace=True)
 
 # Definir la estructura del modelo de la red bayesiana
 model = bn([('Age', 'Survived'), ('Sex', 'Survived'), ('Pclass', 'Survived'), ('Fare', 'Pclass'), ('Embarked', 'Pclass'), ('Parch', 'Survived'), ('SibSp', 'Survived')])
@@ -52,11 +52,9 @@ model.fit(train[features + [target]], estimator=mle) #Entrenar modelo
 inference = ve(model)
 
 # Consultas---------------------------------------------------------------------------------------------------------------------------
-prueba = []
-aux = 0
+result = []
 
 for index, row in test.iterrows():
-    print(aux)
     evidence = {
         'Age': row['Age'],
         'Embarked': row['Embarked'],
@@ -66,14 +64,16 @@ for index, row in test.iterrows():
         'Sex': row['Sex'],
         'SibSp': row['SibSp']
     }
-    prueba.append(evidence)
 
-    aux += 1
+    result.append(inference.query(variables=['Survived'], evidence=evidence))
+
+print(result[0])
 
 
-pru = prueba[8]
-print(pru)
-result = inference.query(variables=['Survived'], evidence=pru)
-print(result)
-# al mayor porcentaje agregar una categoria para saber si se muere o vive 
-#pasar la base de datos a una funcion para hacer las coorelaciones automaticamente 
+
+
+
+
+# al mayor porcentaje agregar una categoria para saber si se muere o vive, mostrar mensaje si tiene tanto porciento escribir tiene tanto porcentaje de sobrevivir o tanto de no sobrevivir
+
+#pasar la base de datos a una funcion para hacer las coorelaciones automaticamente,  Definir la estructura del modelo de la red bayesiana
