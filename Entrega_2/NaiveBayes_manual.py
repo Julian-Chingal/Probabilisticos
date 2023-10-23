@@ -7,12 +7,12 @@ N_Attributes = 0
 media = 0
 sigma = 0
 pi = 0
+# distribucion de probabilidad, para numeros continuos y apartir de esa distribucion es decir cual es la probabilidad de ocurrencia de ese data
 
-
-x_train = train[features]
-y_train = train[target]
-x_test = test[features]
-y_test = test[target]
+# x_train = train[features]
+# y_train = train[target]
+# x_test = test[features]
+# y_test = test[target]
 
 
 # Definicion del modelo

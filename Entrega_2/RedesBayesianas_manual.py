@@ -33,7 +33,8 @@ data['Embarked'].fillna(data['Embarked'].mode()[0], inplace=True)
 data['Sex'] = label.fit_transform(data['Sex']) # 1 masculino,  femenino
 data['Embarked'] = data['Embarked'].replace(['S', 'C', 'Q'], [1, 2, 3])
 
-data['Age'] = pd.qcut(data['Age'], 10, labels=False, duplicates='drop') #Discretizar la edad en 10 intervalos 
+#Discretizar la informacion 
+data['Age'] = pd.qcut(data['Age'], 10, labels=False, duplicates='drop') 
 
 # Training Titanic ----------------------------------------------------------------------------------------------------------------
 train = data[data['train'] == 1]
@@ -55,6 +56,7 @@ prueba = []
 aux = 0
 
 for index, row in test.iterrows():
+    print(aux)
     evidence = {
         'Age': row['Age'],
         'Embarked': row['Embarked'],
@@ -65,10 +67,13 @@ for index, row in test.iterrows():
         'SibSp': row['SibSp']
     }
     prueba.append(evidence)
+
     aux += 1
 
 
-pru = prueba[2]
+pru = prueba[8]
 print(pru)
 result = inference.query(variables=['Survived'], evidence=pru)
 print(result)
+# al mayor porcentaje agregar una categoria para saber si se muere o vive 
+#pasar la base de datos a una funcion para hacer las coorelaciones automaticamente 
