@@ -31,7 +31,7 @@ data['Embarked'].fillna(data['Embarked'].mode()[0], inplace=True)
 
 # Transformar los valores categoricos
 data['Sex'] = label.fit_transform(data['Sex']) # 1 masculino,  femenino
-data['Embarked'] = data['Embarked'].replace(['S', 'C', 'Q'], [1, 2, 3])
+data['Embarked'] = data['Embarked'].replace(['C', 'Q', 'S'], [0, 1, 2])
 
 #Discretizar la informacion, en 10 contenedores o bins para discretizar la variable continua.
 data['Age'] = pd.qcut(data['Age'], 10, labels=False, duplicates='drop') 
@@ -64,7 +64,6 @@ for index, row in test.iterrows():
         'Sex': row['Sex'],
         'SibSp': row['SibSp']
     }
-
     result.append(inference.query(variables=['Survived'], evidence=evidence))
 
 print(result[0])

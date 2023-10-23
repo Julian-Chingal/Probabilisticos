@@ -29,9 +29,8 @@ data['Age'].fillna(data['Age'].median(), inplace=True)
 data['Embarked'].fillna(data['Embarked'].mode()[0], inplace=True)
 
 # Transformar los valores categoricos
-data['Sex'] = label.fit_transform(data['Sex']) 
+data['Sex'] = label.fit_transform(data['Sex'])
 data['Embarked'] = label.fit_transform(data['Embarked'])
-
 data['Age'] = pd.qcut(data['Age'], 10, labels=False, duplicates='drop') #Discretizar la edad en 10 intervalos 
 
 data = data.dropna()
@@ -62,4 +61,3 @@ Matriz.poof()
 
 Matriz= cm(model,x_train,y_train,x_test,y_test,percent=True, cmap="Greens")
 Matriz.poof()
-
