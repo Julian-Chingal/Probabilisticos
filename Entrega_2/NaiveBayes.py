@@ -22,8 +22,10 @@ file['Age'].fillna(file['Age'].median(), inplace=True) #imputar valores faltante
 file['Embarked'].fillna(file['Embarked'].mode()[0], inplace=True)
 file.drop(["PassengerId", "Name", "Ticket", "Cabin"], axis=1, inplace=True) #Eliminar Atributos innecesarios
 file['Sex'] = label.fit_transform(file['Sex']) # Transformar las etiquetas del sexo
+print(file["Embarked"])
 file['Embarked'] = label.fit_transform(file['Embarked'])
-
+print(file["Embarked"])
+print(file.head())
 #--------------------------------------------------------------------------------------------------------------------------------
 # Trainin file Titanic
 input = file.drop(columns=['Survived']) #eliminar la variable objetivo para entrenar le modelo con los atributos
@@ -45,11 +47,11 @@ print("------------------------------------",
 
 #--------------------------------------------------------------------------------------------------------------------------------
 # graphic
-Clases = ["Die","Survival"]
+Clases = ["Not Survival", "Survival"]
 
 Matriz= cm(model,x_train,y_train,x_test,y_test, classes= Clases,cmap="Greens")
 Matriz.poof()
 
-Matriz= cm(model,x_train,y_train,x_test,y_test, classes= Clases, percent=True, cmap="Greens")
+Matriz= cm(model,x_train,y_train,x_test,y_test, classes= Clases,percent=True, cmap="Greens")
 Matriz.poof()
 
