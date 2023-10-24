@@ -7,7 +7,7 @@ from pgmpy.inference import VariableElimination as ve
 from pgmpy.estimators import MaximumLikelihoodEstimator as mle
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split as tts
-from sklearn.metrics import confusion_matrix as cm
+from sklearn.metrics import confusion_matrix, accuracy_score 
 
 #Variables
 label = LabelEncoder()
@@ -72,8 +72,16 @@ for index, row in test.iterrows():
     prediction.append(pre)
     real_value.append(row['Survived'])
 
+# Precision del modelo
+precision = accuracy_score(real_value,prediction)
+print("------------------------------------",
+      f"\nPorcentaje de rendimiento:: {precision}",
+      "\nCantidad de Instancias : ", len(train),
+      "\nCantidad de Prueba: ", len(test), 
+      "\n------------------------------------")
+
 # Matriz de confusion ---------------------------------------------------------
-Matriz = cm(prediction,real_value)
+Matriz = confusion_matrix(prediction,real_value)
 plt.figure(figsize=(8, 6))
 sns.heatmap(Matriz, annot=True,cmap="Greens", fmt="d")
 plt.xlabel("Predicción")
