@@ -1,22 +1,25 @@
 import os
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 from pgmpy.models import BayesianNetwork as bn
 from pgmpy.inference import VariableElimination as ve
 from pgmpy.estimators import MaximumLikelihoodEstimator as mle
 from sklearn.preprocessing import LabelEncoder
-from sklearn.model_selection import train_test_split as tts
-from sklearn.metrics import confusion_matrix as cm
+from yellowbrick.classifier import confusion_matrix as cm
 
 #Variables
 label = LabelEncoder()
-prediction = []
-real_value = []
 
 # Data train
-path = os.path.abspath("Entrega_2/Data/Titanic.csv")    #https://www.kaggle.com/competitions/titanic/data?select=train.csv 
-data = pd.read_csv(path) 
+path = os.path.abspath("Entrega_2/Data/Titanic.csv")    #https://www.kaggle.com/competitions/titanic/data?select=train.csv
+path2 = os.path.abspath("Entrega_2/Data/TitanicTest.csv")    
+
+train = pd.read_csv(path) 
+test = pd.read_csv(path2)
+
+train['train'] = 1
+test['train'] = 0
+
+data = pd.concat([train, test], ignore_index=True, sort=False)
 
 # Preprocess ------------------------------------------------------------------------------------------------------------------
 features = ['Age', 'Embarked', 'Fare', 'Parch', 'Pclass', 'Sex', 'SibSp']
@@ -35,21 +38,24 @@ data['Age'] = pd.qcut(data['Age'], 10, labels=False, duplicates='drop')
 data['Fare'] = pd.qcut(data['Fare'], 10, labels=False, duplicates='drop')
 data['Parch'] = pd.qcut(data['Parch'], 2, labels=False, duplicates='drop')
 
-# Training Titanic ----------------------------------------------------------------------------------------------------------------
-x_train, x_test, y_train, y_test = tts(data[features], data[target], test_size=0.2, random_state=42) 
+print(len(data))
+data = data.dropna()
+print(len(data))
 
-train = pd.concat([x_train, y_train], axis=1)
-test =  pd.concat([x_test, y_test], axis=1)
+# Training Titanic ----------------------------------------------------------------------------------------------------------------
+train = data[data['train'] == 1]
+test = data[data['train'] == 0]
+
+test = test[features].dropna() # valores incompletos
 
 # Definir la estructura del modelo de la red bayesiana
 model = bn([('Age', 'Survived'), ('Sex', 'Survived'), ('Pclass', 'Survived'), ('Fare', 'Pclass'), ('Embarked', 'Pclass'), ('Parch', 'Survived'), ('SibSp', 'Survived')])
-model.fit(train, estimator=mle) #Entrenar modelo
+model.fit(train[features + [target]], estimator=mle) #Entrenar modelo
 
 # inferencia de la red bayesiana
 inference = ve(model)
 
 # Consultas---------------------------------------------------------------------------------------------------------------------------
-
 for index, row in test.iterrows():
     evidence = {
         'Age': row['Age'],
@@ -60,26 +66,17 @@ for index, row in test.iterrows():
         'Sex': row['Sex'],
         'SibSp': row['SibSp']
     }
-    probability = inference.query(variables=['Survived'], evidence=evidence)
+    result = inference.query(variables=['Survived'], evidence=evidence)
 
-    if probability.values[0] > probability.values[1]:
-        pre = 0
-        print(f"Tiene {probability.values[0]*100:.2f}% probabilidad de morir")
+    if result.values[0] > result.values[1]:
+        prediction = 0
     else:
-        pre = 1 
-        print(f"Tiene {probability.values[1]*100:.2f}% probabilidad de sobrevivir")
+        prediction = 1 
 
-    prediction.append(pre)
-    real_value.append(row['Survived'])
 
-# Matriz de confusion ---------------------------------------------------------
-Matriz = cm(prediction,real_value)
-plt.figure(figsize=(8, 6))
-sns.heatmap(Matriz, annot=True,cmap="Greens", fmt="d")
-plt.xlabel("Predicción")
-plt.ylabel("Valor verdadero")
-plt.title("Matriz de Confusión")
-plt.show()
+
+
+
 
 
 # al mayor porcentaje agregar una categoria de desicion para saber si se muere o vive, mostrar mensaje si tiene tanto porciento escribir tiene tanto porcentaje de sobrevivir o tanto de no sobrevivir
