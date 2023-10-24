@@ -11,9 +11,8 @@ from sklearn.metrics import confusion_matrix, accuracy_score
 
 #Variables
 label = LabelEncoder()
-prediction = [] #Almacenar la prediccion del modelo
-real_value = [] # Almacenar la respuseta real del modelo
-prob_survived = []  # Lista para almacenar las probabilidades de supervivencia
+prediction = []
+real_value = []
 
 # Data train
 path = os.path.abspath("Entrega_2/Data/Titanic.csv")    #https://www.kaggle.com/competitions/titanic/data?select=train.csv 
@@ -73,19 +72,13 @@ for index, row in test.iterrows():
     prediction.append(pre)
     real_value.append(row['Survived'])
 
-    #Probabilidad marginal de Sobrevivir
-    prob_survived.append(probability.values[1])
-
-# Precision del modelo -----------------------------------------------------------------------------
-probabilidad_marginal_promedio = sum(prob_survived) / len(prob_survived) # Calcula la probabilidad marginal promedio
-precision = accuracy_score(real_value,prediction) # Presicion del modelo
-
-print("-----------------------------------------------------------",
-      f"\nPorcentaje de rendimiento:: {precision*100:.2f}%",
+# Precision del modelo
+precision = accuracy_score(real_value,prediction)
+print("------------------------------------",
+      f"\nPorcentaje de rendimiento:: {precision* 100:.2f}%",
       "\nCantidad de Instancias : ", len(train),
       "\nCantidad de Prueba: ", len(test), 
-      f"\nProbabilidad Marginal Promedio de Sobrevivir: {probabilidad_marginal_promedio*100:.2f}%", 
-      "\n------------------------------------------------------")
+      "\n------------------------------------")
 
 # Matriz de confusion ---------------------------------------------------------
 Matriz = confusion_matrix(prediction,real_value)
