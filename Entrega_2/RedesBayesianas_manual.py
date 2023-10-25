@@ -22,7 +22,7 @@ path = os.path.abspath("Entrega_2/Data/Titanic.csv")    #https://www.kaggle.com/
 data = pd.read_csv(path) 
 
 # Preprocess ------------------------------------------------------------------------------------------------------------------
-features = ['Age', 'Embarked', 'Fare', 'Parch', 'Pclass', 'Sex', 'SibSp']
+features = ['Age', 'Embarked', 'Fare', 'Parch', 'Pclass', 'Sex']
 target = 'Survived'
 
 #imputar valores faltantes
@@ -33,19 +33,20 @@ data['Embarked'].fillna(data['Embarked'].mode()[0], inplace=True)
 data['Sex'] = label.fit_transform(data['Sex']) # 1 masculino,  femenino
 data['Embarked'] = data['Embarked'].replace(['C', 'Q', 'S'], [0, 1, 2])
 
-#Discretizar la informacion, en 10 contenedores o bins para discretizar la variable continua.
-data['Age'] = pd.qcut(data['Age'], 10, labels=False, duplicates='drop') 
-data['Fare'] = pd.qcut(data['Fare'], 10, labels=False, duplicates='drop')
+#Discretizar la informacion, en contenedores o bins para discretizar la variable continua.
+data['Age'] = pd.qcut(data['Age'], 4, labels=False, duplicates='drop') 
+data['Fare'] = pd.qcut(data['Fare'], 4, labels=False, duplicates='drop')
 data['Parch'] = pd.qcut(data['Parch'], 2, labels=False, duplicates='drop')
 
 # Training Titanic ----------------------------------------------------------------------------------------------------------------
+#Separar datos en entrenamiento y prueba 
 x_train, x_test, y_train, y_test = tts(data[features], data[target], test_size=0.2, random_state=42) 
 
 train = pd.concat([x_train, y_train], axis=1)
 test =  pd.concat([x_test, y_test], axis=1)
 
 # Definir la estructura del modelo de la red bayesiana
-model = bn([('Age', 'Survived'), ('Sex', 'Survived'), ('Pclass', 'Survived'), ('Fare', 'Pclass'), ('Embarked', 'Pclass'), ('Parch', 'Survived'), ('SibSp', 'Survived')])
+model = bn([('Age', 'Survived'), ('Sex', 'Survived'), ('Pclass', 'Survived'), ('Fare', 'Pclass'), ('Embarked', 'Pclass'), ('Parch', 'Survived')])
 model.fit(train, estimator=mle) #Entrenar modelo
 
 # Graph BN----------------------------------------------------------------------------------------------------------------------------
@@ -58,8 +59,12 @@ plt.show()
 # inferencia de la red bayesiana
 inference = ve(model)
 
-# Consultas---------------------------------------------------------------------------------------------------------------------------
+#estimar CPD nodo survival
+cpd_survived = model.get_cpds('Survived')
+print("CPD del nodo 'Survived': \n" , cpd_survived)
 
+# Consultas---------------------------------------------------------------------------------------------------------------------------
+ 
 for index, row in test.iterrows():
     evidence = {
         'Age': row['Age'],
@@ -68,7 +73,6 @@ for index, row in test.iterrows():
         'Parch': row['Parch'],
         'Pclass': row['Pclass'],
         'Sex': row['Sex'],
-        'SibSp': row['SibSp']
     }
     probability = inference.query(variables=['Survived'], evidence=evidence)
 
@@ -80,14 +84,14 @@ for index, row in test.iterrows():
     prediction.append(pre)
     real_value.append(row['Survived'])
 
-    #Probabilidad marginal de Sobrevivir
+    #Probabilidad marginal de Sobrevivir  y No Sobrevivir
     prob_survived.append(probability.values[1])
     prob_die.append(probability.values[0])
  
 # Precision del modelo -----------------------------------------------------------------------------
 proMarginal_survived = sum(prob_survived) / len(prob_survived) # Calcula la probabilidad marginal promedio
 proMarginal_die = sum(prob_die) / len(prob_die) 
-precision = accuracy_score(real_value,prediction) # Presicion del modelo
+precision = accuracy_score(real_value,prediction) # Precision del modelo
 
 print("-----------------------------------------------------------",
       f"\nPorcentaje de rendimiento:: {precision*100:.2f}%",
