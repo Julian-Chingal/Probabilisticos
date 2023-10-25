@@ -4,9 +4,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from pgmpy.models import BayesianNetwork as bn
 from pgmpy.inference import VariableElimination as ve
-from pgmpy.estimators import MaximumLikelihoodEstimator as mle
+from pgmpy.estimators import MaximumLikelihoodEstimator, HillClimbSearch, BicScore
 from sklearn.preprocessing import LabelEncoder
-from sklearn.model_selection import train_test_split as tts
 from sklearn.metrics import confusion_matrix, accuracy_score 
 
 #Variables
@@ -35,21 +34,27 @@ data['Age'] = pd.qcut(data['Age'], 10, labels=False, duplicates='drop')
 data['Fare'] = pd.qcut(data['Fare'], 10, labels=False, duplicates='drop')
 data['Parch'] = pd.qcut(data['Parch'], 2, labels=False, duplicates='drop')
 
-# Training Titanic ----------------------------------------------------------------------------------------------------------------
-x_train, x_test, y_train, y_test = tts(data[features], data[target], test_size=0.2, random_state=42) 
+data['Age'] = data['Age'].astype(str)
+data['Embarked'] = data['Embarked'].astype(str)
+data['Fare'] = data['Fare'].astype(str)
+data['Parch'] = data['Parch'].astype(str)
+data['Pclass'] = data['Pclass'].astype(str)
+data['Sex'] = data['Sex'].astype(str)
+data['SibSp'] = data['SibSp'].astype(str)
+data['Survived'] = data['Survived'].astype(str)
 
-train = pd.concat([x_train, y_train], axis=1)
-test =  pd.concat([x_test, y_test], axis=1)
+# Training Titanic ----------------------------------------------------------------------------------------------------------------
 
 # Definir la estructura del modelo de la red bayesiana
-model = bn([('Age', 'Survived'), ('Sex', 'Survived'), ('Pclass', 'Survived'), ('Fare', 'Pclass'), ('Embarked', 'Pclass'), ('Parch', 'Survived'), ('SibSp', 'Survived')])
-model.fit(train, estimator=mle) #Entrenar modelo
+estimator = HillClimbSearch(data[features + [target]])
+best_model = estimator.estimate(scoring_method=BicScore(data[features + [target]]))
+model = bn(best_model.edges())
+model.fit(data[features + [target]], estimator=MaximumLikelihoodEstimator) #Entrenar modelo
 
 # inferencia de la red bayesiana
 inference = ve(model)
 
 # Consultas---------------------------------------------------------------------------------------------------------------------------
-
 for index, row in test.iterrows():
     evidence = {
         'Age': row['Age'],
@@ -71,6 +76,7 @@ for index, row in test.iterrows():
 
     prediction.append(pre)
     real_value.append(row['Survived'])
+
 
 # Precision del modelo
 precision = accuracy_score(real_value,prediction)

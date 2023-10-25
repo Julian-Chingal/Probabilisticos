@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
+import networkx as nx
 import seaborn as sns
 from pgmpy.models import BayesianNetwork as bn
 from pgmpy.inference import VariableElimination as ve
@@ -14,6 +15,7 @@ label = LabelEncoder()
 prediction = [] #Almacenar la prediccion del modelo
 real_value = [] # Almacenar la respuseta real del modelo
 prob_survived = []  # Lista para almacenar las probabilidades de supervivencia
+prob_die = []  # Lista para almacenar las probabilidades de no supervivencia
 
 # Data train
 path = os.path.abspath("Entrega_2/Data/Titanic.csv")    #https://www.kaggle.com/competitions/titanic/data?select=train.csv 
@@ -46,6 +48,13 @@ test =  pd.concat([x_test, y_test], axis=1)
 model = bn([('Age', 'Survived'), ('Sex', 'Survived'), ('Pclass', 'Survived'), ('Fare', 'Pclass'), ('Embarked', 'Pclass'), ('Parch', 'Survived'), ('SibSp', 'Survived')])
 model.fit(train, estimator=mle) #Entrenar modelo
 
+# Graph BN----------------------------------------------------------------------------------------------------------------------------
+pos = nx.circular_layout(model)
+plt.figure(figsize=(10, 6))
+nx.draw(model, pos, with_labels= True)
+plt.show()
+
+#calculate --------------------------------------------------------------------------------------------------------------------------
 # inferencia de la red bayesiana
 inference = ve(model)
 
@@ -65,26 +74,27 @@ for index, row in test.iterrows():
 
     if probability.values[0] > probability.values[1]:
         pre = 0
-        print(f"Tiene {probability.values[0]*100:.2f}% probabilidad de morir")
     else:
         pre = 1 
-        print(f"Tiene {probability.values[1]*100:.2f}% probabilidad de sobrevivir")
 
     prediction.append(pre)
     real_value.append(row['Survived'])
 
     #Probabilidad marginal de Sobrevivir
     prob_survived.append(probability.values[1])
-
+    prob_die.append(probability.values[0])
+ 
 # Precision del modelo -----------------------------------------------------------------------------
-probabilidad_marginal_promedio = sum(prob_survived) / len(prob_survived) # Calcula la probabilidad marginal promedio
+proMarginal_survived = sum(prob_survived) / len(prob_survived) # Calcula la probabilidad marginal promedio
+proMarginal_die = sum(prob_die) / len(prob_die) 
 precision = accuracy_score(real_value,prediction) # Presicion del modelo
 
 print("-----------------------------------------------------------",
       f"\nPorcentaje de rendimiento:: {precision*100:.2f}%",
       "\nCantidad de Instancias : ", len(train),
       "\nCantidad de Prueba: ", len(test), 
-      f"\nProbabilidad Marginal Promedio de Sobrevivir: {probabilidad_marginal_promedio*100:.2f}%", 
+      f"\nProbabilidad Marginal Promedio de Sobrevivir: {proMarginal_survived*100:.2f}%", 
+      f"\nProbabilidad Marginal Promedio de No Sobrevivir: {proMarginal_die*100:.2f}%", 
       "\n------------------------------------------------------")
 
 # Matriz de confusion ---------------------------------------------------------
@@ -95,8 +105,3 @@ plt.xlabel("Predicción")
 plt.ylabel("Valor verdadero")
 plt.title("Matriz de Confusión")
 plt.show()
-
-
-# al mayor porcentaje agregar una categoria de desicion para saber si se muere o vive, mostrar mensaje si tiene tanto porciento escribir tiene tanto porcentaje de sobrevivir o tanto de no sobrevivir
-# probabilidad marginal
-# pasar la base de datos a una funcion para hacer las coorelaciones automaticamente,  Definir la estructura del modelo de la red bayesiana
