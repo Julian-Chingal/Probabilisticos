@@ -26,8 +26,8 @@ features = ['Age', 'Embarked', 'Fare', 'Parch', 'Pclass', 'Sex']
 target = 'Survived'
 
 #imputar valores faltantes
-data['Age'].fillna(data['Age'].median(), inplace=True)  
-data['Embarked'].fillna(data['Embarked'].mode()[0], inplace=True)
+data['Age'].fillna(data['Age'].median(), inplace=True)   #meidiana el valor central de los datos
+data['Embarked'].fillna(data['Embarked'].mode()[0], inplace=True) #moda datos que mas se repite
 
 # Transformar los valores categoricos
 data['Sex'] = label.fit_transform(data['Sex']) # 1 masculino,  femenino
@@ -89,6 +89,8 @@ for index, row in test.iterrows():
     prob_die.append(probability.values[0])
  
 # Precision del modelo -----------------------------------------------------------------------------
+print("\n Prediccion: " , prediction)
+print("\n Realidad: " , real_value)
 proMarginal_survived = sum(prob_survived) / len(prob_survived) # Calcula la probabilidad marginal promedio
 proMarginal_die = sum(prob_die) / len(prob_die) 
 precision = accuracy_score(real_value,prediction) # Precision del modelo

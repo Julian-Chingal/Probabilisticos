@@ -44,8 +44,8 @@ train = pd.concat([x_train, y_train], axis=1)
 test =  pd.concat([x_test, y_test], axis=1)
 
 # Definir la estructura del modelo de la red bayesiana
-estimator = HillClimbSearch(train)
-best_model = estimator.estimate(scoring_method=BicScore(train))
+estimator = HillClimbSearch(train)  #busca una estructura de red bayesiana optima
+best_model = estimator.estimate(scoring_method=BicScore(train)) # selecciona la mejor estructura de red
 model = bn(best_model.edges())
 model.fit(train, estimator=MaximumLikelihoodEstimator) #Entrenar modelo
 
@@ -86,7 +86,11 @@ for index, row in test.iterrows():
     prob_survived.append(probability.values[1])
     prob_die.append(probability.values[0])
 
+
 # Precision del modelo
+print("\n Prediccion: " , prediction)
+print("\n Realidad: " , real_value)
+
 proMarginal_survived = sum(prob_survived) / len(prob_survived) # Calcula la probabilidad marginal promedio
 proMarginal_die = sum(prob_die) / len(prob_die) 
 precision = accuracy_score(real_value,prediction) # Presicion del modelo
