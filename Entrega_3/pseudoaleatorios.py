@@ -1,56 +1,55 @@
 # Library
 import matplotlib.pyplot as plt
+import sys
 
 # Variables
 seed = 5        # Semilla
-a = 3        # Multiplicador (a) 
-c = 3       # Incremento (c)
-m = 7       # Modulo (m)
+a = 2        # Multiplicador (a) 
+c = 0       # Incremento (c)
+m = 9       # Modulo (m)
 n = 10      # Cantidad de Numeros Pseudoaleatorios (n)
  
 # Function ---------------------------------------------------------------------------------------
 def lcg(seed, a, c, m, n):  # Linear Congruential
-    random_numbers = []
-    random_numbers.append(seed)
-
-    for i in range(n):
-        seed = (a * seed + c) % m
+    if a < m:
+        random_numbers = []
         random_numbers.append(seed)
-    return random_numbers
 
-
+        for i in range(n):
+            seed = (a * seed + c) % m
+            random_numbers.append(seed)
+        return random_numbers
+    else:
+        print("El multiplicador (a) no debe ser mayor al modulo  (m)")
+        sys.exit(1) 
 
 # Implementation ----------------------------------------------------------------------------------
-LinearCongruential = lcg(seed,a,c,m, n)
-
-print(f'Metodo Congruencial Lienal {LinearCongruential}')
-
+methods = [
+    ("Metodo Congruencial Lienal", lcg(seed,a,c,m, n))
+]
 
 # Graph -------------------------------------------------------------------------------------------
+for name, method in methods:
+    print(f'{name} {method}')
 
-# Sequence graph
-plt.figure(figsize=(6,5))
-plt.plot(LinearCongruential, color= 'Green')
-plt.title('Secuencia de números aleatorios')
-plt.xlabel('Índice')
-plt.ylabel('Número aleatorio')
-plt.grid(True)
-
-
-# Histogram
-plt.figure(figsize=(6,5))
-plt.hist(LinearCongruential, bins=30, color= 'Green')
-plt.title('Histograma de números aleatorios')
-plt.xlabel('Número aleatorio')
-plt.ylabel('Frecuencia')
-plt.grid(True)
-
-
-# ACF(Autocorrelation)
-plt.figure(figsize=(6,5))
-plt.acorr(LinearCongruential, maxlags=10, color= 'Green')
-plt.title('Gráfico de autocorrelación')
-plt.xlabel('Retraso')
-plt.ylabel('Autocorrelación')
-plt.grid(True)
-plt.show()
+    fig, axs = plt.subplots(3, 1, figsize=(6, 9))
+    # Sequence graph
+    axs[0].plot(method, color='Green')
+    axs[0].set_title(f'Secuencia de números aleatorios: {name}')
+    axs[0].set_xlabel('Índice')
+    axs[0].set_ylabel('Número aleatorio')
+    axs[0].grid(True)
+    # Histogram
+    axs[1].hist(method, bins=30, color='Green')
+    axs[1].set_title(f'Histograma de números aleatorios: {name}')
+    axs[1].set_xlabel('Número aleatorio')
+    axs[1].set_ylabel('Frecuencia')
+    axs[1].grid(True)
+    # ACF(Autocorrelation)
+    axs[2].acorr(method, maxlags=10, color='Green')
+    axs[2].set_title(f'Gráfico de autocorrelación: {name}')
+    axs[2].set_xlabel('Retraso')
+    axs[2].set_ylabel('Autocorrelación')
+    axs[2].grid(True)
+    plt.subplots_adjust(wspace=0, hspace=1)
+    plt.show()
