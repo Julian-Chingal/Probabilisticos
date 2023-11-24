@@ -84,7 +84,6 @@ def disPoiss(lam, u, min, max): #? poisson distribution
         res_poiss.append(rango) 
     return res_poiss
 
-
 def disExpo(lam,r): #? exponencial distribution
     return -(1/lam)*np.log(r)
 
