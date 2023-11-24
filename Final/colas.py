@@ -10,9 +10,12 @@ arrivalList = []
 serviceList = []
 catered = []
 
-# Variables para guardar tabla
+# Variables para guardar tabla\
+pathMatrix = "./Final/Data/matrix.xlsx"
 df = pd.DataFrame()
 df = pd.DataFrame(columns=['id', 'Tiempo Llegada', 'Tiempo Atencion', 'Tiempo Espera', 'Tiempo Atencion Cliente','Tiempo Ocio Server'])
+
+df.to_excel(pathMatrix, index= False)
 
 # Variables de entrada
 t_server = int(input("Indique las horas de trabajo del servidor (H): "))
@@ -51,4 +54,7 @@ class client:
 
 for i in range(0, 50):
     a = arrivalClient(m_arri)
+    b = serviceTime(m_atten)
+
     print(a)
+    print(b)
