@@ -72,8 +72,15 @@ def addRow(id, arri_t, serv_t, wait_t, id_ser): #? Agregar fila al excel
             'Tiempo Atencion': serv_t, 
             'Tiempo Espera': wait_t, 
             'id Server': id_ser}
+    
+    # if not df.empty:
+    #     df = pd.concat([df, pd.DataFrame([newRow])], ignore_index= True)
+    # else:
+    #     df = pd.DataFrame([newRow])
 
     df = pd.concat([df, pd.DataFrame([newRow])], ignore_index= True)
+    
+    
     
 
 def simulate(time):
@@ -81,10 +88,11 @@ def simulate(time):
 
     id_client = 1  #? id cliente
     simulation_t = conv_mins(time)
+    print(simulation_t)
     i = 0
-
-    while (current_time <= simulation_t or len(cola) > 0) and i < 90000 : #? bucle funcionamiento 
+    while current_time <= simulation_t or len(cola) > 0 : #? bucle funcionamiento 
         Client = client(id=id_client) # Crea un objetos cliente 
+        print(i)
         i += 1
         
 

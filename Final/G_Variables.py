@@ -1,6 +1,5 @@
 import time as t 
 import numpy as np
-import math 
 
 # Class 
 class random_variables:
